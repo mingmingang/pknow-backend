@@ -108,11 +108,6 @@ namespace pknow_backend.Controllers
                 string userCaptchaInput = value["captcha"]?.ToString();
                 string sessionCaptchaCode = _captchaService.CaptchaCode;
 
-                Console.WriteLine($"Username: {value["username"]}");
-                Console.WriteLine($"Password: {value["password"]}");
-                Console.WriteLine($"Captcha: {userCaptchaInput}");
-                Console.WriteLine($"Session Captcha Code: {HttpContext.Session.GetString("CaptchaCode")}");
-
 
                 if (string.IsNullOrEmpty(sessionCaptchaCode) || userCaptchaInput.ToLower() != sessionCaptchaCode.ToLower())
                 {
@@ -133,99 +128,6 @@ namespace pknow_backend.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-
-
-        [HttpPost]
-        //[SupportedOSPlatform("windows")]
-        public IActionResult LoginTMS([FromBody] dynamic data)
-        {
-            try
-            {
-                JObject value = JObject.Parse(data.ToString());
-
-                string userCaptchaInput = value["captcha"]?.ToString();
-                string sessionCaptchaCode = _captchaService.CaptchaCode;
-
-                Console.WriteLine($"Username: {value["username"]}");
-                Console.WriteLine($"Password: {value["password"]}");
-                Console.WriteLine($"Captcha: {userCaptchaInput}");
-                Console.WriteLine($"Session Captcha Code: {HttpContext.Session.GetString("CaptchaCode")}");
-
-
-                if (string.IsNullOrEmpty(sessionCaptchaCode) || userCaptchaInput.ToLower() != sessionCaptchaCode.ToLower())
-                {
-                    return BadRequest(new { error = "Captcha tidak valid." });
-                }
-
-                // Lanjutkan dengan autentikasi
-                dt = lib.CallProcedure("sso_getAuthenticationTMS", EncodeData.HtmlEncodeObject(value));
-                if (dt.Rows.Count == 0)
-                {
-                    return Ok(JsonConvert.SerializeObject(new { Status = "LOGIN FAILED" }));
-                }
-
-                return Ok(JsonConvert.SerializeObject(dt));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-        }
-
-
-
-        [Authorize]
-        [HttpPost]
-        public IActionResult RegisterGoogleUser([FromBody] dynamic data)
-        {
-            try
-            {
-                JObject value = JObject.Parse(data.ToString());
-                string email = value["email"]?.ToString();
-                string namaLengkap = value["namaLengkap"]?.ToString();
-                string gender = value["gender"]?.ToString();
-                string phone = value["noTelp"]?.ToString();
-                string createdBy = value["createdBy"]?.ToString();
-
-                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(namaLengkap))
-                {
-                    return BadRequest("Email atau nama lengkap tidak boleh kosong.");
-                }
-
-                // Membuat objek JObject untuk parameter prosedur
-                var parametersCheck = new JObject
-        {
-            { "Email", email }
-        };
-
-                DataTable dtCheck = lib.CallProcedure("CheckUserByEmail", EncodeData.HtmlEncodeObject(parametersCheck));
-                if (dtCheck.Rows.Count == 0) // If user is not registered
-                {
-                    var parametersInsert = new JObject
-            {
-                { "ext_nama_lengkap", namaLengkap },
-                { "ext_username", email },
-                { "ext_password", null }, // Google account doesn't require a password
-                { "ext_gender", gender ?? string.Empty }, // Default value if null
-                { "ext_no_telp", phone ?? string.Empty }, // Default value if null
-                { "ext_created_by", createdBy ?? "Google" } // Default value if null
-            };
-
-                    DataTable dt = lib.CallProcedure("InsertNewGoogleUser", EncodeData.HtmlEncodeObject(parametersInsert));
-                }
-                return Ok(new { message = "Berhasil mendaftarkan akun Google." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Gagal menyimpan data pengguna.", error = ex.Message });
-            }
-        }
-
-
-
-
-
-
 
         [HttpPost]
         public IActionResult CreateJWTToken([FromBody] dynamic data)

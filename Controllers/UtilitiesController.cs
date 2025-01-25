@@ -130,6 +130,120 @@ namespace pknow_backend.Controllers
         }
 
         [HttpPost]
+        //[SupportedOSPlatform("windows")]
+        public IActionResult LoginTMS([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+
+                string userCaptchaInput = value["captcha"]?.ToString();
+                string sessionCaptchaCode = _captchaService.CaptchaCode;
+
+                Console.WriteLine($"Username: {value["username"]}");
+                Console.WriteLine($"Password: {value["password"]}");
+                Console.WriteLine($"Captcha: {userCaptchaInput}");
+                Console.WriteLine($"Session Captcha Code: {HttpContext.Session.GetString("CaptchaCode")}");
+
+
+                if (string.IsNullOrEmpty(sessionCaptchaCode) || userCaptchaInput.ToLower() != sessionCaptchaCode.ToLower())
+                {
+                    return BadRequest(new { error = "Captcha tidak valid." });
+                }
+
+                // Lanjutkan dengan autentikasi
+                dt = lib.CallProcedure("sso_getAuthenticationTMS", EncodeData.HtmlEncodeObject(value));
+
+                if (dt.Rows.Count == 0)
+                {
+                    return Ok(JsonConvert.SerializeObject(new { Status = "LOGIN FAILED" }));
+                }
+
+                return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        //[SupportedOSPlatform("windows")]
+        public IActionResult RegisterUser([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+
+                string username = value["username"]?.ToString();
+                string namaLengkap = value["namaLengkap"]?.ToString();
+
+                Console.WriteLine("Email diterima: " + username);
+                Console.WriteLine("Nama lengkap diterima: " + namaLengkap);
+
+                if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(namaLengkap))
+                {
+                    return BadRequest("Email atau nama lengkap tidak boleh kosong.");
+                }
+
+                // Lanjutkan dengan autentikasi
+                dt = lib.CallProcedure("CheckUserByEmail", EncodeData.HtmlEncodeObject(value));
+                    if (dt.Rows.Count == 0)
+                    {
+                        Console.WriteLine("aang diterima: " + username);
+                        dt = lib.CallProcedure("InsertNewUser", EncodeData.HtmlEncodeObject(value));
+                        return Ok(JsonConvert.SerializeObject(new { Status = "Berhasil mendaftarkan pengguna" }));
+                    }
+                    return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        //[SupportedOSPlatform("windows")]
+        public IActionResult RegisterGoogleUser([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+
+                string email = value["email"]?.ToString();
+                string namaLengkap = value["namaLengkap"]?.ToString();
+
+                Console.WriteLine("Email diterima: " + email);
+                Console.WriteLine("Nama lengkap diterima: " + namaLengkap);
+                
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(namaLengkap))
+                {
+                    return BadRequest("Email atau nama lengkap tidak boleh kosong.");
+                }
+                
+                // Lanjutkan dengan autentikasi
+                dt = lib.CallProcedure("CheckUserByEmail", EncodeData.HtmlEncodeObject(value));
+                
+                if (dt.Rows.Count == 0)
+                {
+                    Console.WriteLine("aang diterima: " + email);
+                    dt = lib.CallProcedure("InsertNewGoogleUser", EncodeData.HtmlEncodeObject(value));
+                    return Ok(JsonConvert.SerializeObject(new { Status = "Berhasil Mendaftarkan Akun Google" }));
+                }
+                return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
+
+
+        [HttpPost]
         public IActionResult CreateJWTToken([FromBody] dynamic data)
         {
             try

@@ -38,6 +38,18 @@ namespace pknow_backend.Controllers
         }
 
         [HttpPost]
+        public IActionResult GetKategoriByIDProgram([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+                dt = lib.CallProcedure("pknow_getDataKategoriByProgram", EncodeData.HtmlEncodeObject(value));
+                return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch { return BadRequest(); }
+        }
+
+        [HttpPost]
         public IActionResult EditKategoriProgram([FromBody] dynamic data)
         {
             try

@@ -26,6 +26,30 @@ namespace pknow_backend.Controllers
         }
 
         [HttpPost]
+        public IActionResult GetMetodePembayaran([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+                dt = lib.CallProcedure("pknow_getMetodePembayaran", EncodeData.HtmlEncodeObject(value));
+                return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch { return BadRequest(); }
+        }
+
+        [HttpPost]
+        public IActionResult GetKategoriMetode([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+                dt = lib.CallProcedure("pknow_getKategoriMetode", EncodeData.HtmlEncodeObject(value));
+                return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch { return BadRequest(); }
+        }
+
+        [HttpPost]
         public IActionResult GetDataKKByAKK([FromBody] dynamic data)
         {
             try
@@ -36,6 +60,31 @@ namespace pknow_backend.Controllers
             }
             catch { return BadRequest(); }
         }
+
+        [HttpPost]
+        public IActionResult GetDataProgramALL([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+                dt = lib.CallProcedure("pknow_getDataProgramAll", EncodeData.HtmlEncodeObject(value));
+                return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch { return BadRequest(); }
+        }
+
+        [HttpPost]
+        public IActionResult PublikasiProgram([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+                dt = lib.CallProcedure("pknow_updatePublikasiProgram", EncodeData.HtmlEncodeObject(value));
+                return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch { return BadRequest(); }
+        }
+
 
         [HttpPost]
         public IActionResult CreateProgram([FromBody] dynamic data)
@@ -56,6 +105,18 @@ namespace pknow_backend.Controllers
             {
                 JObject value = JObject.Parse(data.ToString());
                 dt = lib.CallProcedure("pknow_getDataProgram", EncodeData.HtmlEncodeObject(value));
+                return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch { return BadRequest(); }
+        }
+
+        [HttpPost]
+        public IActionResult GetProgramAll([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+                dt = lib.CallProcedure("pknow_getDataProgramAll", EncodeData.HtmlEncodeObject(value));
                 return Ok(JsonConvert.SerializeObject(dt));
             }
             catch { return BadRequest(); }

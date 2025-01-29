@@ -329,6 +329,30 @@ namespace pknow_backend.Controllers
             catch { return BadRequest(); }
         }
 
+        [HttpPost]
+        public IActionResult GetUserExternal([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+                dt = lib.CallProcedure("pknow_getUserExternal", EncodeData.HtmlEncodeObject(value));
+                return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch { return BadRequest(); }
+        }
+
+        [HttpPost]
+        public IActionResult EditUserExternal([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+                dt = lib.CallProcedure("pknow_editUserExternal", EncodeData.HtmlEncodeObject(value));
+                return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch { return BadRequest(); }
+        }
+
         [Authorize]
         [HttpPost]
         public IActionResult createNotifikasi([FromBody] dynamic data)

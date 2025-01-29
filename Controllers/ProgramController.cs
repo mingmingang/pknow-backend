@@ -74,6 +74,18 @@ namespace pknow_backend.Controllers
         }
 
         [HttpPost]
+        public IActionResult BatalkanPublikasi([FromBody] dynamic data)
+        {
+            try
+            {
+                JObject value = JObject.Parse(data.ToString());
+                dt = lib.CallProcedure("pknow_batalkanPublikasi", EncodeData.HtmlEncodeObject(value));
+                return Ok(JsonConvert.SerializeObject(dt));
+            }
+            catch { return BadRequest(); }
+        }
+
+        [HttpPost]
         public IActionResult PublikasiProgram([FromBody] dynamic data)
         {
             try
